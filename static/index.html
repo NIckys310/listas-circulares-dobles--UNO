@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mesa de Turnos UNO</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="logo">UNO</span>
+      <div>
+        <h1>Mesa de Turnos</h1>
+        <p>Lista circular doble: cada jugador está enlazado con su vecino de la izquierda (<code>prev</code>) y de la derecha (<code>next</code>).</p>
+      </div>
+    </div>
+    <button id="btn-reset" class="ghost">Reiniciar mesa</button>
+  </header>
+
+  <main>
+    <section class="board">
+      <svg id="table" viewBox="-300 -300 600 600" aria-label="Mesa circular de jugadores"></svg>
+      <div id="toast" role="status"></div>
+    </section>
+
+    <aside class="panel">
+      <div class="card">
+        <h2>Turno actual</h2>
+        <div class="turn">
+          <span id="current-name">—</span>
+          <span id="direction" class="badge">↻ Horario</span>
+        </div>
+        <div class="cards-grid">
+          <button data-action="number" class="uno-card c-blue"><b>7</b><small>Numérica</small></button>
+          <button data-action="reverse" class="uno-card c-green"><b>⇄</b><small>Reversa</small></button>
+          <button data-action="skip" class="uno-card c-red"><b>⊘</b><small>Salta</small></button>
+          <button data-action="draw_two" class="uno-card c-yellow"><b>+2</b><small>Roba dos</small></button>
+        </div>
+        <button data-action="draw" class="wide">📥 Robar carta y pasar</button>
+      </div>
+
+      <div class="card">
+        <h2>Agregar jugador (insertar nodo)</h2>
+        <form id="form-join">
+          <input id="in-name" placeholder="Nombre del jugador" maxlength="14" required>
+          <div class="row">
+            <label>Cartas <input id="in-cards" type="number" min="1" max="20" value="7"></label>
+            <label>Posición
+              <select id="in-after">
+                <option value="">Al final (antes del primero)</option>
+              </select>
+            </label>
+          </div>
+          <button type="submit">➕ Sentar jugador</button>
+        </form>
+        <p class="hint">Haz clic en un jugador de la mesa para sacarlo (eliminar nodo).</p>
+        <button data-action="shuffle" class="ghost wide">🔀 Mezclar puestos</button>
+      </div>
+
+      <div class="card">
+        <h2>Recorrido de la lista</h2>
+        <p class="trav"><span class="tag">next →</span> <span id="trav-next"></span></p>
+        <p class="trav"><span class="tag">← prev</span> <span id="trav-prev"></span></p>
+        <details>
+          <summary>Ver punteros de cada nodo</summary>
+          <table>
+            <thead><tr><th>prev</th><th>Jugador</th><th>next</th><th>Cartas</th></tr></thead>
+            <tbody id="pointers"></tbody>
+          </table>
+        </details>
+      </div>
+
+      <div class="card">
+        <h2>Podio 🏆</h2>
+        <ol id="winners"><li class="muted">Nadie ha ganado todavía</li></ol>
+        <h2>Historial</h2>
+        <ul id="log"></ul>
+      </div>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

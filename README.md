@@ -14,7 +14,7 @@ En UNO los turnos **nunca terminan**: después del último jugador le toca otra 
 
 ## 🌐 Ver en línea
 
-**https://nickys310.github.io/uno-turn-table/**
+**https://nickys310.github.io/listas-circulares-dobles--UNO/**
 
 En GitHub Pages el mismo código Python corre dentro del navegador con [Pyodide](https://pyodide.org). La primera carga tarda unos segundos.
 

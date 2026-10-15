@@ -1,41 +1,22 @@
 """
 Small web server (Python standard library only, nothing to install).
 
-Run:  python server.py   ->   open http://localhost:5050
+Run:  python server.py         (only this computer)
+      python server.py --lan   (phones on the same WiFi too)
+      ->   open http://localhost:5050
 """
 
 import json
+import socket
 import sys
 import webbrowser
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from turn_table import TurnTable
+from api import handle
 
 PORT = 5050
 STATIC_DIR = Path(__file__).parent / "static"
-
-table = TurnTable()
-for demo_name in ("Nicky", "Alex", "Sofía", "Mateo"):
-    table.join_player(demo_name)
-
-# action name -> function that receives the JSON body
-ACTIONS = {
-    "join": lambda body: table.join_player(body.get("name", ""), int(body.get("cards", 7))),
-    "join_after": lambda body: table.join_player_after(
-        body.get("name", ""), body.get("after", ""), int(body.get("cards", 7))
-    ),
-    "eliminate": lambda body: table._record(
-        f"🚪 {table.eliminate_player(body.get('name', '')).name} abandonó la mesa."
-    ),
-    "number": lambda body: table.play_number(),
-    "reverse": lambda body: table.play_reverse(),
-    "skip": lambda body: table.play_skip(),
-    "draw_two": lambda body: table.play_draw_two(),
-    "draw": lambda body: table.draw_card(),
-    "shuffle": lambda body: table.shuffle_seats(),
-    "reset": lambda body: table.reset(),
-}
 
 
 class TurnTableHandler(SimpleHTTPRequestHandler):
@@ -56,29 +37,32 @@ class TurnTableHandler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == "/api/state":
-            return self._send_json(table.to_dict())
+            return self._send_json(*handle("state"))
         return super().do_GET()
 
     def do_POST(self):
-        action = self.path.removeprefix("/api/")
-        if action not in ACTIONS:
-            return self._send_json({"error": "Acción desconocida."}, 404)
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}")
-        try:
-            ACTIONS[action](body)
-        except ValueError as error:
-            return self._send_json({"error": str(error), **table.to_dict()}, 400)
-        return self._send_json(table.to_dict())
+        return self._send_json(*handle(self.path.removeprefix("/api/"), body))
 
     def log_message(self, *args):
         pass  # keep the console clean
 
 
+def local_ip():
+    """IP of this computer on the local network (WiFi / LAN)."""
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
+        probe.connect(("8.8.8.8", 80))  # no data is sent, it only picks the network card
+        return probe.getsockname()[0]
+
+
 if __name__ == "__main__":
-    server = ThreadingHTTPServer(("localhost", PORT), TurnTableHandler)
+    lan = "--lan" in sys.argv
+    server = ThreadingHTTPServer(("0.0.0.0" if lan else "localhost", PORT), TurnTableHandler)
     url = f"http://localhost:{PORT}"
     print(f"Mesa de turnos UNO corriendo en {url}  (Ctrl+C para salir)")
+    if lan:
+        print(f"Desde otro dispositivo en la misma red: http://{local_ip()}:{PORT}")
     if "--no-browser" not in sys.argv:
         webbrowser.open(url)
     try:

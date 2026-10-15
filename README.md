@@ -12,7 +12,13 @@ En UNO los turnos **nunca terminan**: después del último jugador le toca otra 
         └──────────── prev ───────────┘
 ```
 
-## ▶️ Cómo ejecutarlo
+## 🌐 Ver en línea
+
+**https://nickys310.github.io/uno-turn-table/**
+
+En GitHub Pages el mismo código Python corre dentro del navegador con [Pyodide](https://pyodide.org). La primera carga tarda unos segundos.
+
+## ▶️ Cómo ejecutarlo en tu computador
 
 Solo necesitas Python 3.9 o superior (no hay que instalar librerías).
 
@@ -21,6 +27,8 @@ python server.py
 ```
 
 Se abre el navegador en **http://localhost:5050**.
+
+Para abrirlo desde un celular conectado al mismo WiFi: `python server.py --lan`.
 
 Pruebas unitarias:
 
@@ -33,7 +41,9 @@ python -m unittest -v
 | Archivo | Contenido |
 |---|---|
 | `turn_table.py` | Clase `Player` (nodo) y clase `TurnTable` (lista circular doble) |
-| `server.py` | Servidor web con la API JSON (librería estándar de Python) |
+| `api.py` | Acciones que puede pedir la página (las usa el servidor y la versión en línea) |
+| `server.py` | Servidor web local (librería estándar de Python) |
+| `index.html` | Entrada para GitHub Pages |
 | `static/` | Interfaz en español (HTML, CSS y JavaScript) |
 | `test_turn_table.py` | Pruebas unitarias |
 

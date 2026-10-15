@@ -38,12 +38,7 @@ function showToast(message, isError = false) {
 }
 
 async function api(action, body = {}) {
-  const response = await fetch(`/api/${action}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const data = await response.json();
+  const data = await backend.request(action, body);
   if (data.error) showToast(data.error, true);
   render(data);
   return data;
@@ -179,4 +174,4 @@ document.getElementById("form-join").addEventListener("submit", async (event) =>
   }
 });
 
-fetch("/api/state").then((r) => r.json()).then(render);
+backend.state().then(render);
